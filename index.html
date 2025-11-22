@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TravelAI – Smart Travel Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      color: #e5e7eb;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .app {
+      max-width: 900px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 24px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+      padding: 24px 24px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      backdrop-filter: blur(12px);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin: 0 0 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    h1 span.logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: conic-gradient(from 220deg, #22c55e, #22d3ee, #a855f7, #22c55e);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .subtitle {
+      color: #9ca3af;
+      margin-bottom: 1.4rem;
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 18px;
+      padding: 14px 16px 16px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+    }
+    label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      outline: none;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus,
+    select:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .row > div {
+      flex: 1;
+      min-width: 0;
+    }
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #e5e7eb;
+    }
+    .weather-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      font-size: 0.8rem;
+      color: #d1d5db;
+      margin-bottom: 0.2rem;
+    }
+    .weather-options label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .weekday-select {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .weekday-select select {
+      max-width: 140px;
+    }
+    .btn-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #4b5563;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+      white-space: nowrap;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: transparent;
+      color: #022c22;
+      font-weight: 500;
+    }
+    button.secondary {
+      background: #020617;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    button[disabled] {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    .outputs {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .output-box {
+      background: #020617;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid #374151;
+      min-height: 120px;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+    .output-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .muted {
+      color: #6b7280;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .footer {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer a {
+      color: #9ca3af;
+      text-decoration: none;
+      border-bottom: 1px dotted #4b5563;
+    }
+    .footer a:hover {
+      color: #e5e7eb;
+      border-bottom-style: solid;
+    }
+    @media (max-width: 780px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .outputs {
+        grid-template-columns: 1fr;
+      }
+      .app {
+        padding: 18px 16px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>
+        <span class="logo">✈️</span>
+        TravelAI <span style="font-size: 0.8rem; color:#9ca3af;">(Local Backend)</span>
+      </h1>
+      <div class="subtitle">
+        Get city weather (Open-Meteo) and live places (SerpAPI via Python backend).
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Inputs -->
+      <div class="card">
+        <div class="row">
+          <div>
+            <label for="cityInput">City</label>
+            <input id="cityInput" type="text" placeholder="e.g. Bangalore, Paris, New Delhi" />
+          </div>
+          <div>
+            <label for="tagInput">Place filter (optional)</label>
+            <input id="tagInput" type="text" placeholder="e.g. park, museum, temple" />
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <div class="section-title">Weather range</div>
+          <div class="weather-options">
+            <label>
+              <input type="radio" name="weatherMode" value="current" checked />
+              Current
+            </label>
+            <label>
+              <input type="radio" name="weatherMode" value="tomorrow" />
+              Tomorrow
+            </label>
+            <label>
+              <input type="radio" name="weatherMode" value="next7" />
+              Next 7 days
+            </label>
+          </div>
+          <div class="weekday-select">
+            <label>
+              <input type="radio" name="weatherMode" value="weekday" />
+              Next weekday:
+            </label>
+            <select id="weekdaySelect">
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary" id="btnBoth">Plan weather + places</button>
+          <button class="secondary" id="btnWeather">Only weather</button>
+          <button class="secondary" id="btnPlaces">Only places</button>
+          <button class="secondary" id="btnMorePlaces" disabled>More places</button>
+        </div>
+        <div class="pill">
+          <span>💡 Tip:</span>
+          Run <code style="font-family:monospace;">python app.py</code> before using "places".
+        </div>
+      </div>
+
+      <!-- RIGHT: Outputs -->
+      <div class="card">
+        <div class="outputs">
+          <div>
+            <div class="output-title">Weather</div>
+            <div id="weatherOutput" class="output-box muted">
+              No weather requested yet. Choose a city and click a button.
+            </div>
+          </div>
+          <div>
+            <div class="output-title">Places</div>
+            <div id="placesOutput" class="output-box muted">
+              No places requested yet. Choose a city and click “Only places” or “Plan weather + places”.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div>Python backend: Flask on <code>http://localhost:5000</code>.</div>
+      <div>Weather: Open-Meteo · Places: SerpAPI via <code>/api/places</code>.</div>
+    </footer>
+  </div>
+
+  <script>
+    // -----------------------------
+    // Helpers mapped from your Python code
+    // -----------------------------
+
+    // format_city_name from main.py (capitalize each word)
+    function formatCityName(city) {
+      return city
+        .trim()
+        .split(/\s+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+    }
+
+    // weekday_to_date from main.py – next occurrence of weekday (YYYY-MM-DD)
+    function weekdayToNextDate(dayName) {
+      const days = {
+        sunday: 0,
+        monday: 1,
+        tuesday: 2,
+        wednesday: 3,
+        thursday: 4,
+        friday: 5,
+        saturday: 6,
+      };
+      const key = (dayName || "").toLowerCase();
+      if (!(key in days)) return null;
+
+      const today = new Date();
+      const target = days[key];
+      const current = today.getDay(); // 0–6, Sunday = 0
+      let diff = (target - current + 7) % 7;
+      if (diff === 0) diff = 7; // always next occurrence, not today
+
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + diff);
+      return targetDate.toISOString().split("T")[0];
+    }
+
+    // get_coordinates (Nominatim) – similar to coordinates.py
+    async function getCoordinates(placeName) {
+      const url =
+        "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" +
+        encodeURIComponent(placeName);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Coordinate lookup failed: " + res.status);
+
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon),
+      };
+    }
+
+    // get_weather logic from weather.py, adapted to JS
+    async function getWeather(lat, lon, mode) {
+      const url = "https://api.open-meteo.com/v1/forecast";
+      const params = new URLSearchParams({
+        latitude: lat,
+        longitude: lon,
+        current_weather: "true",
+        daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_mean",
+        forecast_days: "7",
+        timezone: "auto",
+      });
+
+      let data;
+      try {
+        const res = await fetch(url + "?" + params.toString());
+        if (!res.ok) {
+          return "Weather service error: " + res.status;
+        }
+        data = await res.json();
+      } catch (err) {
+        return "Weather service error: " + err.message;
+      }
+
+      // mode == null / "current"
+      if (!mode || mode === "current") {
+        if (data.current_weather) {
+          const c = data.current_weather;
+          return [
+            "Current Weather:",
+            `Temperature: ${c.temperature} °C`,
+            `Wind Speed: ${c.windspeed} km/h`,
+          ].join("\n");
+        }
+        return "Current weather not available.";
+      }
+
+      const daily = data.daily || {};
+      const dates = daily.time || [];
+      const maxTemp = daily.temperature_2m_max || [];
+      const minTemp = daily.temperature_2m_min || [];
+      const rainProb = daily.precipitation_probability_mean || [];
+
+      if (!dates.length || dates.length !== maxTemp.length ||
+          dates.length !== minTemp.length || dates.length !== rainProb.length) {
+        return "Forecast data not available or incomplete.";
+      }
+
+      if (mode === "tomorrow") {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split("T")[0];
+        const idx = dates.indexOf(dateStr);
+        if (idx === -1) return "Tomorrow's weather not available.";
+        return [
+          `Tomorrow's Weather (${dateStr}):`,
+          `Max: ${maxTemp[idx]} °C`,
+          `Min: ${minTemp[idx]} °C`,
+          `Rain Chance: ${rainProb[idx]}%`,
+        ].join("\n");
+      }
+
+      if (mode === "next7") {
+        const lines = ["Next 7 Days Forecast:"];
+        for (let i = 0; i < dates.length; i++) {
+          lines.push(
+            `${dates[i]} → Max: ${maxTemp[i]} °C, Min: ${minTemp[i]} °C, Rain: ${rainProb[i]}%`
+          );
+        }
+        return lines.join("\n");
+      }
+
+      // If mode looks like a specific date ("YYYY-MM-DD")
+      if (/^\d{4}-\d{2}-\d{2}$/.test(mode)) {
+        const idx = dates.indexOf(mode);
+        if (idx === -1) return "Weather for " + mode + " not available.";
+        return [
+          `Weather on ${mode}:`,
+          `Max: ${maxTemp[idx]} °C`,
+          `Min: ${minTemp[idx]} °C`,
+          `Rain Chance: ${rainProb[idx]}%`,
+        ].join("\n");
+      }
+
+      return "Invalid weather mode.";
+    }
+
+    // Backend-powered version: calls your Flask API at http://localhost:5000/api/places
+    async function getTop50Attractions(city, tag) {
+      const params = new URLSearchParams({
+        city,
+        tag: tag || "",
+      });
+
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/places?" + params.toString()
+        );
+        if (!res.ok) {
+          return [`Error fetching places: HTTP ${res.status}`];
+        }
+
+        const data = await res.json();
+        const places = data.places || [];
+
+        if (!places.length) {
+          if (data.message) {
+            return [data.message];
+          }
+          return [`No places found for ${city}.`];
+        }
+
+        return places;
+      } catch (err) {
+        return ["Error fetching places: " + err.message];
+      }
+    }
+
+    // -----------------------------
+    // UI Logic
+    // -----------------------------
+    const cityInput = document.getElementById("cityInput");
+    const tagInput = document.getElementById("tagInput");
+    const weekdaySelect = document.getElementById("weekdaySelect");
+    const weatherOutput = document.getElementById("weatherOutput");
+    const placesOutput = document.getElementById("placesOutput");
+    const btnBoth = document.getElementById("btnBoth");
+    const btnWeather = document.getElementById("btnWeather");
+    const btnPlaces = document.getElementById("btnPlaces");
+    const btnMorePlaces = document.getElementById("btnMorePlaces");
+
+    let cachedPlaces = [];
+    let placesIndex = 0;
+
+    function getSelectedWeatherMode() {
+      const radios = document.querySelectorAll("input[name='weatherMode']");
+      let value = "current";
+      radios.forEach(r => {
+        if (r.checked) value = r.value;
+      });
+      if (value === "weekday") {
+        const weekday = weekdaySelect.value;
+        const dateStr = weekdayToNextDate(weekday);
+        return dateStr || "current";
+      }
+      return value;
+    }
+
+    function setLoading(buttons, isLoading) {
+      buttons.forEach(btn => {
+        if (!btn) return;
+        btn.disabled = isLoading || (btn === btnMorePlaces && !cachedPlaces.length);
+      });
+      if (isLoading) {
+        weatherOutput.classList.remove("muted");
+        weatherOutput.textContent = "TravelAI is thinking… 🧠";
+      }
+    }
+
+    function showWeather(text) {
+      weatherOutput.classList.remove("muted");
+      weatherOutput.textContent = text || "No weather data.";
+    }
+
+    function showPlacesBatch(reset = false) {
+      if (reset) {
+        placesOutput.textContent = "";
+      }
+      const box = placesOutput;
+      box.classList.remove("muted");
+
+      if (!cachedPlaces.length) {
+        box.textContent = "No places found for this city.";
+        btnMorePlaces.disabled = true;
+        return;
+      }
+
+      if (reset) {
+        box.textContent = "";
+      }
+
+      const end = Math.min(placesIndex + 5, cachedPlaces.length);
+      const slice = cachedPlaces.slice(placesIndex, end);
+      if (slice.length === 0 && !reset) {
+        box.textContent += (box.textContent ? "\n" : "") + "No more places to show.";
+        btnMorePlaces.disabled = true;
+        return;
+      }
+
+      const lines = slice.map(p => "• " + p);
+      box.textContent += (box.textContent ? "\n" : "") + lines.join("\n");
+      placesIndex = end;
+      btnMorePlaces.disabled = placesIndex >= cachedPlaces.length;
+    }
+
+    async function handleRequest({ wantWeather, wantPlaces }) {
+      const rawCity = cityInput.value || "";
+      if (!rawCity.trim()) {
+        alert("Please enter a city name first.");
+        return;
+      }
+
+      const city = formatCityName(rawCity);
+      cityInput.value = city;
+
+      const tag = tagInput.value.trim() || null;
+      const mode = getSelectedWeatherMode();
+
+      setLoading([btnBoth, btnWeather, btnPlaces], true);
+
+      try {
+        if (wantWeather) {
+          let coords = null;
+          try {
+            coords = await getCoordinates(city);
+          } catch (e) {
+            showWeather(`Error finding coordinates: ${e.message}`);
+          }
+          if (!coords) {
+            showWeather(`I couldn't find coordinates for ${city}.`);
+          } else {
+            const weatherText = await getWeather(coords.lat, coords.lon, mode);
+            showWeather(`TravelAI · ${city}\n\n` + weatherText);
+          }
+        }
+
+        if (wantPlaces) {
+          placesOutput.classList.remove("muted");
+          placesOutput.textContent = "Finding interesting places in " + city + "…";
+          cachedPlaces = await getTop50Attractions(
+            city,
+            tag || "tourist attractions"
+          );
+          placesIndex = 0;
+          showPlacesBatch(true);
+        }
+      } finally {
+        setLoading([btnBoth, btnWeather, btnPlaces], false);
+      }
+    }
+
+    btnBoth.addEventListener("click", () =>
+      handleRequest({ wantWeather: true, wantPlaces: true })
+    );
+    btnWeather.addEventListener("click", () =>
+      handleRequest({ wantWeather: true, wantPlaces: false })
+    );
+    btnPlaces.addEventListener("click", () =>
+      handleRequest({ wantWeather: false, wantPlaces: true })
+    );
+    btnMorePlaces.addEventListener("click", () => showPlacesBatch(false));
+
+    // Small UX: Enter key on city input = “Plan weather + places”
+    cityInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btnBoth.click();
+      }
+    });
+  </script>
+</body>
+</html>
