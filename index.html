@@ -477,15 +477,10 @@
 
     // Backend-powered version: calls your Flask API at http://localhost:5000/api/places
     async function getTop50Attractions(city, tag) {
-      const params = new URLSearchParams({
-        city,
-        tag: tag || "",
-      });
+          const res = await fetch(
+      "https://travelai-backend.onrender.com/api/places?" + params.toString()
+    );
 
-      try {
-        const res = await fetch(
-          "http://localhost:5000/api/places?" + params.toString()
-        );
         if (!res.ok) {
           return [`Error fetching places: HTTP ${res.status}`];
         }
